@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <link rel="stylesheet" href="style.css" />
+        <script src="app.js" defer></script>
+    </head>
+    <body>
+        <header>
+            <div class="main-menu">
+                <div class="logo-place">
+                    <img src="./img/logo.png" alt="logo">
+                </div>
+                <nav class="menu-place">
+                    <ul class="menu-list">
+                        <li><a class="transition active-tab " href="#">БАНК</a></li>
+                        <li><a class="transition not-allowed" href="#">БИЗНЕС</a></li>
+                        <li><a class="transition not-allowed" href="#">ИНВИСТИЦИИ</a></li>
+                        <li><a class="transition not-allowed" href="#">СТРАХОВАНИЕ</a></li>
+                        <li><a class="transition not-allowed" href="#">МОБАЙЛ</a></li>
+                        <li><a class="transition not-allowed" href="#">ПУТЕШЕСТВИЯ</a></li>
+                        <li><a class="transition not-allowed" href="#">РАЗВЛЕЧЕНИЯ</a></li>
+                    </ul>
+                </nav>
+                <div class="button-place">
+                    <button class="login-btn transition  not-allowed">ВОЙТИ</button>
+                </div>
+            </div>
+        </header>
+        <main>
+            <div class="converter-main-ontainer">
+                <h1>Конвертер валют онлайн</h1>
+                <div class="converter-forms-container">
+                    <div class="converter-form saving">
+                        <p>У меня есть</p>
+                        <ul class="currency-selection">
+                            <li class="transition active-currency">RUB</li>
+                            <li class="transition">USD</li>
+                            <li class="transition">EUR</li>
+                            <li class="transition">GBP</li>                             
+                        </ul>
+                        <div class="input-area">
+                            <input value="0.00" type="number">
+                            <p class="p-saving"></p>
+                        </div>
+                    </div>
+                    <div class="converter-form invest">
+                        <p>Хочу приобрести</p>
+                        <ul class="currency-selection">
+                            <li class="transition">RUB</li>
+                            <li class="transition active-currency">USD</li>
+                            <li class="transition">EUR</li>
+                            <li class="transition">GBP</li>                             
+                        </ul>
+                        <div class="input-area">
+                            <input value="0.00" type="number">
+                            <p class="p-invest"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>
