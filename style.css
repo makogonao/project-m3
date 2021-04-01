@@ -197,3 +197,7 @@ main {
 .input-area input::-webkit-inner-spin-button {
     -webkit-appearance: none;
 }
+
+.input-area input[type='number'] {
+    -moz-appearance: textfield;
+}
