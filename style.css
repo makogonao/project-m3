@@ -103,7 +103,9 @@ main {
 }
 
 .converter-main-ontainer{
-    width: 60%;
+    width: 80%;
+    max-width: 1000px;
+    min-width: 700px;
 }
 
 .converter-main-ontainer h1 {
@@ -121,7 +123,7 @@ main {
 
 .converter-form{
     color: #C6C6C6;
-    width: 40%;
+    width: 45%;
 }
 
 .converter-form ul{
@@ -161,7 +163,7 @@ main {
     border-bottom-left-radius: 4px;
 }
 
-.converter-form li:hover{
+.converter-form li:hover, .invest-select:hover, .saving-select:hover{
     background-color: #ffef74;
     color: black;
     font-weight: 1000;
@@ -171,11 +173,6 @@ main {
 
 }
 
-.active-currency {
-    background-color: #833AE0;
-    color: white;
-    font-weight: 1000;
-}
 
 .input-area {
     margin-top: 20px;
@@ -200,4 +197,50 @@ main {
 
 .input-area input[type='number'] {
     -moz-appearance: textfield;
+}
+
+.invest-select, .saving-select{
+    width: 20%;
+    font-size: inherit;
+    color: inherit;
+    outline: none;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    text-align-last: center;
+    border: 1px solid #C6C6C6;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    background: url(./img/br_down.png) no-repeat right;
+    background-position-x: 92%;
+}
+
+option{
+    font-family: 'Roboto';
+    font-weight: normal;
+    background:white;
+    color: black;
+}
+
+
+
+
+
+.active-currency {
+    background-color: #833AE0;
+    color: white;
+    font-weight: 1000;
+}
+
+.replace-corrency {
+    width: 30px;
+    opacity: 0.2;
+    margin-top: 27px;
+    cursor: pointer;
+}
+
+.replace-corrency:hover {
+    opacity: 1;
 }
