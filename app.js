@@ -1,7 +1,8 @@
+const myApiUrl = "https://api.ratesapi.io/api/";
 let savingCurrency = "RUB";
 let investCurrency = "USD";
-const savingCurrencyAmount = document.querySelector(".saving input");
-const investCurrencyAmount = document.querySelector(".invest input");
+const savingCurrencyAmountInput = document.querySelector(".saving input");
+const investCurrencyAmountInput = document.querySelector(".invest input");
 let savingCurrencySelect = document.querySelector(".saving-select");
 let investCurrencySelect = document.querySelector(".invest-select");
 let savingCurrencyOptions = document.querySelectorAll(".saving-select option");
@@ -15,10 +16,11 @@ const savingPriceTag = document.querySelector(".p-saving");
 const investPriceTag = document.querySelector(".p-invest");
 let priceCurrency1 = 1;
 let priceCurrency2 = 0;
+let bigK = 1;
 let priceNow = {};
 let allApiCurrency = []; 
 
-fetch("https://api.ratesapi.io/api/latest?base=RUB")
+fetch(`${myApiUrl}latest?base=RUB`)
     .then((response) => response.json())
     .then((price) => {
         priceNow = {...price.rates}
@@ -64,13 +66,14 @@ function replace() {
         // console.log(newSavingCurrency.value)
         savingCurrency = newSavingCurrency.value;
         priceCurrency1 = getPrice(newSavingCurrency.value);
-        investCurrencyAmount.value = (Number(savingCurrencyAmount.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
+        //investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
+        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
         updatePrice()
     } else {
         // console.log(newSavingCurrency.innerHTML)
         savingCurrency = newSavingCurrency.innerHTML;
         priceCurrency1 = getPrice(newSavingCurrency.innerHTML);
-        investCurrencyAmount.value = (Number(savingCurrencyAmount.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
+        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
         updatePrice()
 
     }
@@ -79,41 +82,16 @@ function replace() {
         // console.log(newInvestCurrency.value)
         investCurrency = newInvestCurrency.value;
         priceCurrency2 = getPrice(newInvestCurrency.value);
-        investCurrencyAmount.value = (Number(savingCurrencyAmount.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
+        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
         updatePrice()
     } else {
         // console.log(newInvestCurrency.innerHTML)
         investCurrency = newInvestCurrency.innerHTML;
         priceCurrency2 = getPrice(newInvestCurrency.innerHTML);
-        investCurrencyAmount.value = (Number(savingCurrencyAmount.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
-        updatePrice()
-    }
-
-
- 
-    // if (['RUB', 'GBP', 'USD', 'EUR'].includes(savingCurrency)){
-
-    //     savingCurrency = newSavingCurrency.innerText;
-    //     priceCurrency1 = getPrice(newSavingCurrency.innerText);
-    //     investCurrencyAmount.value = (Number(savingCurrencyAmount.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
-    //     updatePrice()
-
-    // } else {
-  
-    // }
-
-    // if (['RUB', 'GBP', 'USD', 'EUR'].includes(investCurrency)){
-
-    //     investCurrency = newInvestCurrency.innerText;
-    //     priceCurrency2 = getPrice(newInvestCurrency.innerText);
-    //     investCurrencyAmount.value = (Number(savingCurrencyAmount.value) / getK(false, priceCurrency1, priceCurrency2)).toFixed(2);
-    //     updatePrice()
-
-    // } else {
-
-
+        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
 
     }
+}
 
     function GetCurrensyIndex (btns) {
         s = 0;
@@ -132,8 +110,8 @@ function getPrice(currency) {
 }    
 
 function updatePrice() {
-    savingPriceTag.innerText = `1 ${savingCurrency} = ${(1/getK(false, priceCurrency1, priceCurrency2)).toFixed(4)} ${investCurrency}`
-    investPriceTag.innerText = `1 ${investCurrency} = ${getK(false, priceCurrency1, priceCurrency2).toFixed(4)} ${savingCurrency}`
+    savingPriceTag.innerText = `1 ${savingCurrency} = ${getK(true, priceCurrency1, priceCurrency2).toFixed(4)} ${investCurrency}`
+    investPriceTag.innerText = `1 ${investCurrency} = ${(1/getK(true, priceCurrency1, priceCurrency2)).toFixed(4)} ${savingCurrency}`
 }
 
 function getK(from, k1, k2) {
@@ -141,6 +119,20 @@ function getK(from, k1, k2) {
         return k1 / k2;
     } else {
         return k2 / k1;
+    }
+}
+
+async function getCurrenciesRatioFromApi (savCur, invCur) {
+    
+    if (savCur === invCur) {
+        return 1
+    } else {
+        const response = await fetch(`${myApiUrl}latest?base=${savCur}&symbols=${invCur}`);
+        const data = await response.json();
+        //console.log(data.rates[invCur])
+        coefficient = await data.rates[invCur];
+        updatePrice();
+        return data.rates[invCur];
     }
 }
 
@@ -164,7 +156,7 @@ savingCurrencySelect.addEventListener("change", (event) => {
     //console.log(event.target.options[event.target.selectedIndex].value)
     savingCurrency = event.target.options[event.target.selectedIndex].value;
     priceCurrency1 = getPrice(event.target.options[event.target.selectedIndex].value);
-    investCurrencyAmount.value = (Number(savingCurrencyAmount.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
+    investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
     updatePrice()
     //console.log(event.target.innerText)
 });
@@ -174,7 +166,7 @@ investCurrencySelect.addEventListener("change", (event) => {
     //console.log(event.target.options[event.target.selectedIndex].value)
     investCurrency = event.target.options[event.target.selectedIndex].value;
     priceCurrency2 = getPrice(event.target.options[event.target.selectedIndex].value);
-    investCurrencyAmount.value = (Number(savingCurrencyAmount.value) / getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
+    investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) / getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
     updatePrice()
     //console.log(event.target.innerText)
 });
@@ -186,7 +178,7 @@ savingCurrencyTabs.forEach((element) => {
         changeStyle(event.target, savingCurrencyBtns)
         savingCurrency = event.target.innerText;
         priceCurrency1 = getPrice(event.target.innerText);
-        investCurrencyAmount.value = (Number(savingCurrencyAmount.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
+        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
         updatePrice()
         //console.log(event.target.innerText)
     });
@@ -197,32 +189,32 @@ investCurrencyTabs.forEach((element) => {
         changeStyle(event.target, investCurrencyBtns)
         investCurrency = event.target.innerText;
         priceCurrency2 = getPrice(event.target.innerText);
-        investCurrencyAmount.value = (Number(savingCurrencyAmount.value) / getK(false, priceCurrency1, priceCurrency2)).toFixed(2);
+        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2); // false /
         updatePrice()
         //console.log(event.target.innerText)
     });
 });
 
-savingCurrencyAmount.addEventListener("keyup", (e) => {
-    investCurrencyAmount.value = (Number(e.target.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
+savingCurrencyAmountInput.addEventListener("keyup", (e) => {
+    investCurrencyAmountInput.value = (Number(e.target.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
 });
 
-investCurrencyAmount.addEventListener("keyup", (e) => {
-    savingCurrencyAmount.value = (Number(e.target.value) * getK(false, priceCurrency1, priceCurrency2)).toFixed(2);
+investCurrencyAmountInput.addEventListener("keyup", (e) => {
+    savingCurrencyAmountInput.value = (Number(e.target.value) / getK(true, priceCurrency1, priceCurrency2)).toFixed(2); // false *
 });
 
-savingCurrencyAmount.addEventListener("click", (e) => {
-    investCurrencyAmount.value = (Number(e.target.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
+savingCurrencyAmountInput.addEventListener("click", (e) => {
+    investCurrencyAmountInput.value = (Number(e.target.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
 });
 
-investCurrencyAmount.addEventListener("click", (e) => {
-    savingCurrencyAmount.value = (Number(e.target.value) * getK(false, priceCurrency1, priceCurrency2)).toFixed(2);
+investCurrencyAmountInput.addEventListener("click", (e) => {
+    savingCurrencyAmountInput.value = (Number(e.target.value) / getK(true, priceCurrency1, priceCurrency2)).toFixed(2); // false *
 });
 
-savingCurrencyAmount.addEventListener("blur", (e) => {
-  savingCurrencyAmount.value = (Number(e.target.value)).toFixed(2);
+savingCurrencyAmountInput.addEventListener("blur", (e) => {
+  savingCurrencyAmountInput.value = (Number(e.target.value)).toFixed(2);
 });
 
-investCurrencyAmount.addEventListener("blur", (e) => {
-  investCurrencyAmount.value = (Number(e.target.value)).toFixed(2);
+investCurrencyAmountInput.addEventListener("blur", (e) => {
+  investCurrencyAmountInput.value = (Number(e.target.value)).toFixed(2);
 });
