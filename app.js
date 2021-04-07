@@ -11,134 +11,106 @@ let savingCurrencyTabs = document.querySelectorAll(".saving li");
 let investCurrencyTabs = document.querySelectorAll(".invest li");
 let savingCurrencyBtns = [...savingCurrencyTabs, savingCurrencySelect];
 let investCurrencyBtns = [...investCurrencyTabs, investCurrencySelect];
-let replaceBtn = document.querySelector(".replace-corrency")
+let replaceBtn = document.querySelector(".replace-corrency");
 const savingPriceTag = document.querySelector(".p-saving");
 const investPriceTag = document.querySelector(".p-invest");
-let priceCurrency1 = 1;
-let priceCurrency2 = 0;
-let bigK = 1;
+let coefficient = 1;
 let priceNow = {};
-let allApiCurrency = []; 
+let allApiCurrency = [];
+const errorForm = document.querySelector(".error");
+const closeErrBtn = document.querySelector(".close span");
+
+closeErrBtn.addEventListener("click", (e) => {
+    errorForm.classList.toggle('invisible')
+});
 
 fetch(`${myApiUrl}latest?base=RUB`)
     .then((response) => response.json())
     .then((price) => {
-        priceNow = {...price.rates}
-        //console.log(priceNow)
-        allApiCurrency = Object.getOwnPropertyNames(priceNow).sort()
-        priceCurrency2 = getPrice('USD');
-        const selects = document.querySelectorAll('ul select')
-            selects.forEach(element => {
-                element.innerHTML = ""    
+        priceNow = { ...price.rates };
+        allApiCurrency = Object.getOwnPropertyNames(priceNow).sort();
+        const selects = document.querySelectorAll("ul select");
+        selects.forEach((element) => {
+            element.innerHTML = "";
+        });
+        selects.forEach((element) => {
+            element.append;
+            allApiCurrency.forEach((e) => {
+                let newOption = document.createElement("option");
+                newOption.innerText = e;
+                if (!["RUB", "GBP", "USD", "EUR"].includes(e)) {
+                    element.append(newOption);}
             });
-            selects.forEach(element => {
-                element.append
-                allApiCurrency.forEach(e => {
-                    let newOption  = document.createElement('option')
-                    newOption.innerText = e;
-                    if (!['RUB', 'GBP', 'USD', 'EUR'].includes(e))
-                    {
-                        element.append(newOption)                 
-                    }
-                })
-            });
-        updatePrice()
+        });
         savingCurrencyOptions = document.querySelectorAll(".saving-select option");
         investCurrencyOptions = document.querySelectorAll(".invest-select option");
     });
 
+    getCurrenciesRatioFromApi(true);
+    
 replaceBtn.addEventListener("click", () => {
     replace();
-})    
+});
 
 function replace() {
     let newSavingCurrency = savingCurrencyBtns[GetCurrensyIndex(investCurrencyBtns)];
     let newInvestCurrency = investCurrencyBtns[GetCurrensyIndex(savingCurrencyBtns)];
-    let oldSavingCurrencySelectVal = savingCurrencySelect.value
-    let oldInvestCurrencySelectVal = investCurrencySelect.value
-    //console.log(`${oldSavingCurrencySelectVal}, ${oldInvestCurrencySelectVal}`)
-    savingCurrencySelect.value = oldInvestCurrencySelectVal
-    investCurrencySelect.value = oldSavingCurrencySelectVal
-    changeStyle(newSavingCurrency, savingCurrencyBtns)
-    changeStyle(newInvestCurrency, investCurrencyBtns)
+    let oldSavingCurrencySelectVal = savingCurrencySelect.value;
+    let oldInvestCurrencySelectVal = investCurrencySelect.value;
+    savingCurrencySelect.value = oldInvestCurrencySelectVal;
+    investCurrencySelect.value = oldSavingCurrencySelectVal;
+    changeStyle(newSavingCurrency, savingCurrencyBtns);
+    changeStyle(newInvestCurrency, investCurrencyBtns);
 
-    if (GetCurrensyIndex(savingCurrencyBtns)===4) {
-        // console.log(newSavingCurrency.value)
+    if (GetCurrensyIndex(savingCurrencyBtns) === 4) {
         savingCurrency = newSavingCurrency.value;
-        priceCurrency1 = getPrice(newSavingCurrency.value);
-        //investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
-        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
-        updatePrice()
+        getCurrenciesRatioFromApi(true);
     } else {
-        // console.log(newSavingCurrency.innerHTML)
         savingCurrency = newSavingCurrency.innerHTML;
-        priceCurrency1 = getPrice(newSavingCurrency.innerHTML);
-        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
-        updatePrice()
-
+        getCurrenciesRatioFromApi(true);
     }
 
-    if (GetCurrensyIndex(investCurrencyBtns)===4) {
-        // console.log(newInvestCurrency.value)
+    if (GetCurrensyIndex(investCurrencyBtns) === 4) {
         investCurrency = newInvestCurrency.value;
-        priceCurrency2 = getPrice(newInvestCurrency.value);
-        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
-        updatePrice()
+        getCurrenciesRatioFromApi(true);
     } else {
-        // console.log(newInvestCurrency.innerHTML)
         investCurrency = newInvestCurrency.innerHTML;
-        priceCurrency2 = getPrice(newInvestCurrency.innerHTML);
-        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
-
+        getCurrenciesRatioFromApi(true);
     }
 }
 
-    function GetCurrensyIndex (btns) {
-        s = 0;
-        btns.forEach((e) => {
-            //console.log(e)
-            if (e.classList.contains('active-currency')) {
-                s = [].indexOf.call(e.parentNode.children, e);
-            }
-        })
-        return s;
-    }
-
-
-function getPrice(currency) {
-    return 1/priceNow[currency];
-}    
-
-function updatePrice() {
-    savingPriceTag.innerText = `1 ${savingCurrency} = ${getK(true, priceCurrency1, priceCurrency2).toFixed(4)} ${investCurrency}`
-    investPriceTag.innerText = `1 ${investCurrency} = ${(1/getK(true, priceCurrency1, priceCurrency2)).toFixed(4)} ${savingCurrency}`
+function GetCurrensyIndex(btns) {
+    s = 0;
+    btns.forEach((e) => {
+        if (e.classList.contains("active-currency")) {
+            s = [].indexOf.call(e.parentNode.children, e);
+        }
+    });
+    return s;
 }
 
-function getK(from, k1, k2) {
-    if (from) {
-        return k1 / k2;
+async function getCurrenciesRatioFromApi(isStraight) {
+    if (savingCurrency === investCurrency) {
+        coefficient = 1;
     } else {
-        return k2 / k1;
-    }
-}
-
-async function getCurrenciesRatioFromApi (savCur, invCur) {
-    
-    if (savCur === invCur) {
-        return 1
-    } else {
-        const response = await fetch(`${myApiUrl}latest?base=${savCur}&symbols=${invCur}`);
+        try {
+        const response = await fetch(`${myApiUrl}latest?base=${savingCurrency}&symbols=${investCurrency}`);
         const data = await response.json();
-        //console.log(data.rates[invCur])
-        coefficient = await data.rates[invCur];
-        updatePrice();
-        return data.rates[invCur];
+        coefficient = await data.rates[investCurrency];
+        } catch (err) {
+            errorForm.classList.toggle('invisible')
+        }
+    }
+    savingPriceTag.innerText = `1 ${savingCurrency} = ${coefficient.toFixed(4 )} ${investCurrency}`;
+    investPriceTag.innerText = `1 ${investCurrency} = ${(1 / coefficient).toFixed(4)} ${savingCurrency}`;
+    if (isStraight) {
+        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * coefficient).toFixed(2);
+    } else {
+        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) / coefficient).toFixed(2);
     }
 }
 
-
-function changeStyle (event, btns) {
-    //console.log(event)
+function changeStyle(event, btns) {
     delActiveCurrensy(btns);
     event.classList.toggle("active-currency");
     function delActiveCurrensy(btns) {
@@ -150,71 +122,62 @@ function changeStyle (event, btns) {
     }
 }
 
-
 savingCurrencySelect.addEventListener("change", (event) => {
     changeStyle(event.target, savingCurrencyBtns);
-    //console.log(event.target.options[event.target.selectedIndex].value)
     savingCurrency = event.target.options[event.target.selectedIndex].value;
-    priceCurrency1 = getPrice(event.target.options[event.target.selectedIndex].value);
-    investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
-    updatePrice()
-    //console.log(event.target.innerText)
+    getCurrenciesRatioFromApi(true);
 });
 
 investCurrencySelect.addEventListener("change", (event) => {
     changeStyle(event.target, investCurrencyBtns);
-    //console.log(event.target.options[event.target.selectedIndex].value)
     investCurrency = event.target.options[event.target.selectedIndex].value;
-    priceCurrency2 = getPrice(event.target.options[event.target.selectedIndex].value);
-    investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) / getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
-    updatePrice()
-    //console.log(event.target.innerText)
+    getCurrenciesRatioFromApi(false);
 });
-
 
 savingCurrencyTabs.forEach((element) => {
     element.addEventListener("click", (event) => {
-
-        changeStyle(event.target, savingCurrencyBtns)
+        changeStyle(event.target, savingCurrencyBtns);
         savingCurrency = event.target.innerText;
-        priceCurrency1 = getPrice(event.target.innerText);
-        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
-        updatePrice()
-        //console.log(event.target.innerText)
+        getCurrenciesRatioFromApi(true);
     });
 });
 
 investCurrencyTabs.forEach((element) => {
     element.addEventListener("click", (event) => {
-        changeStyle(event.target, investCurrencyBtns)
+        changeStyle(event.target, investCurrencyBtns);
         investCurrency = event.target.innerText;
-        priceCurrency2 = getPrice(event.target.innerText);
-        investCurrencyAmountInput.value = (Number(savingCurrencyAmountInput.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2); // false /
-        updatePrice()
-        //console.log(event.target.innerText)
+        getCurrenciesRatioFromApi(true);
     });
 });
 
 savingCurrencyAmountInput.addEventListener("keyup", (e) => {
-    investCurrencyAmountInput.value = (Number(e.target.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
+    investCurrencyAmountInput.value = (
+        Number(e.target.value) * coefficient
+    ).toFixed(2);
 });
 
 investCurrencyAmountInput.addEventListener("keyup", (e) => {
-    savingCurrencyAmountInput.value = (Number(e.target.value) / getK(true, priceCurrency1, priceCurrency2)).toFixed(2); // false *
+    savingCurrencyAmountInput.value = (
+        Number(e.target.value) / coefficient
+    ).toFixed(2); // false *
 });
 
 savingCurrencyAmountInput.addEventListener("click", (e) => {
-    investCurrencyAmountInput.value = (Number(e.target.value) * getK(true, priceCurrency1, priceCurrency2)).toFixed(2);
+    investCurrencyAmountInput.value = (
+        Number(e.target.value) * coefficient
+    ).toFixed(2);
 });
 
 investCurrencyAmountInput.addEventListener("click", (e) => {
-    savingCurrencyAmountInput.value = (Number(e.target.value) / getK(true, priceCurrency1, priceCurrency2)).toFixed(2); // false *
+    savingCurrencyAmountInput.value = (
+        Number(e.target.value) / coefficient
+    ).toFixed(2); // false *
 });
 
 savingCurrencyAmountInput.addEventListener("blur", (e) => {
-  savingCurrencyAmountInput.value = (Number(e.target.value)).toFixed(2);
+    savingCurrencyAmountInput.value = Number(e.target.value).toFixed(2);
 });
 
 investCurrencyAmountInput.addEventListener("blur", (e) => {
-  investCurrencyAmountInput.value = (Number(e.target.value)).toFixed(2);
+    investCurrencyAmountInput.value = Number(e.target.value).toFixed(2);
 });
