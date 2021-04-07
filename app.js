@@ -45,8 +45,7 @@ fetch(`${myApiUrl}latest?base=RUB`)
         savingCurrencyOptions = document.querySelectorAll(".saving-select option");
         investCurrencyOptions = document.querySelectorAll(".invest-select option");
     });
-
-    getCurrenciesRatioFromApi(true);
+getCurrenciesRatioFromApi(true);
     
 replaceBtn.addEventListener("click", () => {
     replace();
